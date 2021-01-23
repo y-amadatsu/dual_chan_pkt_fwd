@@ -21,6 +21,7 @@
 #include "internal/meta.h"
 #include "internal/strfunc.h"
 #include <new>      // placement new
+#include <algorithm>
 
 #ifdef _MSC_VER
 RAPIDJSON_DIAG_PUSH
@@ -1631,8 +1632,13 @@ private:
     void SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
         flags_ = kArrayFlag;
         if (count) {
-            data_.a.elements = (GenericValue*)allocator.Malloc(count * sizeof(GenericValue));
-            std::memcpy(data_.a.elements, values, count * sizeof(GenericValue));
+            // data_.a.elements = (GenericValue*)allocator.Malloc(count * sizeof(GenericValue));
+            // std::memcpy(data_.a.elements, values, count * sizeof(GenericValue));
+            auto arr = static_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
+            for (SizeType idx = 0; idx < count; ++idx)
+                new (arr + idx) GenericValue;
+            data_.a.elements = arr;
+            std::copy_n(values, count, arr);
         }
         else
             data_.a.elements = NULL;
@@ -1643,8 +1649,13 @@ private:
     void SetObjectRaw(Member* members, SizeType count, Allocator& allocator) {
         flags_ = kObjectFlag;
         if (count) {
-            data_.o.members = (Member*)allocator.Malloc(count * sizeof(Member));
-            std::memcpy(data_.o.members, members, count * sizeof(Member));
+            // data_.o.members = (Member*)allocator.Malloc(count * sizeof(Member));
+            // std::memcpy(data_.o.members, members, count * sizeof(Member));
+            auto arr = static_cast<Member*>(allocator.Malloc(count * sizeof(Member)));
+            for (SizeType idx = 0; idx < count; ++idx)
+                new (arr + idx) Member;
+            data_.o.members = arr;
+            std::copy_n(members, count, arr);
         }
         else
             data_.o.members = NULL;

@@ -229,7 +229,8 @@ char interface[6];     // Used to set the interface to communicate to the intern
 #define FRF_MID                  0x06
 #define FRF_LSB                  0x66
 
-// Tx Power Register add 
+// Tx Power Register
+#define REG_PA_CFG               0x09
 // Power Setting for Japan ARIB STD-T108
 // 20mW=13dBm
 // SX1276 RegPaConfig(0x09), Val=0x3f
